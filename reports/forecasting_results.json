@@ -1,0 +1,87 @@
+{
+  "linear_regression": {
+    "comparison": {
+      "best_stock_model": "ols",
+      "best_stock_mse": 0.023526,
+      "best_stock_r2": 0.021156,
+      "best_polymarket_model": "elasticnet",
+      "best_polymarket_mse": 0.057593,
+      "best_polymarket_r2": 0.095143,
+      "stock_more_predictable": true
+    },
+    "stock": {
+      "domain": "stock",
+      "csv_path": "..\\data\\processed\\nasdaq_cleaned_features_sample.csv",
+      "target_column": "Target_Log_Return",
+      "n_rows": 483229,
+      "use_polynomial": true,
+      "cv_folds": 10,
+      "models": {
+        "ols": {
+          "model_type": "ols",
+          "mse": 0.023526,
+          "r2_score": 0.021156,
+          "tuning_info": { "grid_size": 1 }
+        },
+        "ridge": {
+          "model_type": "ridge",
+          "alpha_used": 4.76269,
+          "mse": 0.024031,
+          "r2_score": 0.000126,
+          "tuning_info": { "grid_size": 150 }
+        },
+        "lasso": {
+          "model_type": "lasso",
+          "alpha_used": 100.0,
+          "mse": 0.024034,
+          "r2_score": -0.000006,
+          "tuning_info": { "grid_size": 150 }
+        },
+        "elasticnet": {
+          "model_type": "elasticnet",
+          "alpha_used": 100.0,
+          "mse": 0.024034,
+          "r2_score": -0.000006,
+          "tuning_info": { "grid_size": 250 }
+        }
+      }
+    },
+    "polymarket": {
+      "domain": "polymarket",
+      "csv_path": "..\\data\\processed\\polymarket_cleaned_features.csv",
+      "target_column": "Target_Deviation",
+      "n_rows": 2582,
+      "use_polynomial": true,
+      "cv_folds": 10,
+      "models": {
+        "ols": {
+          "model_type": "ols",
+          "mse": 7.085053,
+          "r2_score": -110.315759,
+          "tuning_info": { "grid_size": 1 }
+        },
+        "ridge": {
+          "model_type": "ridge",
+          "alpha_used": 3137.9375,
+          "mse": 0.322242,
+          "r2_score": -4.062858,
+          "tuning_info": { "grid_size": 150 }
+        },
+        "lasso": {
+          "model_type": "lasso",
+          "alpha_used": 100.0,
+          "mse": 0.063675,
+          "r2_score": -0.000427,
+          "tuning_info": { "grid_size": 150 }
+        },
+        "elasticnet": {
+          "model_type": "elasticnet",
+          "alpha_used": 0.1,
+          "mse": 0.057593,
+          "r2_score": 0.095143,
+          "tuning_info": { "grid_size": 250 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "comparison": {
+    "variance_threshold": 0.95,
+    "scaler": "standard",
+    "lower_intrinsic_dimensionality_domain": "stock",
+    "component_difference": 5
+  },
+  "stock": {
+    "domain": "stock",
+    "csv_path": "data/sandbox/stocks/demo_stock_aapl.csv",
+    "n_rows": 300,
+    "n_original_columns": 7,
+    "dropped_columns": [
+      "Date"
+    ],
+    "n_numeric_features_used": 6,
+    "scaler": "standard",
+    "variance_threshold": 0.95,
+    "components_to_threshold": 2,
+    "components_used_for_feature_scores": 2,
+    "top_explained_variance_ratio": [
+      0.8334136888377355,
+      0.16653210394662152,
+      3.765400644282333e-05,
+      1.655320911382616e-05,
+      8.643296078796312e-14,
+      0.0
+    ],
+    "top_cumulative_explained_variance": [
+      0.8334136888377355,
+      0.999945792784357,
+      0.9999834467907999,
+      0.9999999999999137,
+      1.0000000000000002,
+      1.0000000000000002
+    ],
+    "feature_scores": [
+      {
+        "feature": "High",
+        "score": 0.3739359857385426
+      },
+      {
+        "feature": "Open",
+        "score": 0.37383750818956635
+      },
+      {
+        "feature": "Low",
+        "score": 0.37363601201222446
+      },
+      {
+        "feature": "Close",
+        "score": 0.3736360120122244
+      },
+      {
+        "feature": "Adj Close",
+        "score": 0.3736359995740678
+      },
+      {
+        "feature": "Volume",
+        "score": 0.1783783047168795
+      }
+    ]
+  },
+  "polymarket": {
+    "domain": "polymarket",
+    "csv_path": "data/sandbox/polymarket/demo_polymarket_markets.csv",
+    "n_rows": 500,
+    "n_original_columns": 23,
+    "dropped_columns": [
+      "id",
+      "slug",
+      "marketType",
+      "sportsMarketType",
+      "category",
+      "subcategory"
+    ],
+    "n_numeric_features_used": 17,
+    "scaler": "standard",
+    "variance_threshold": 0.95,
+    "components_to_threshold": 7,
+    "components_used_for_feature_scores": 7,
+    "top_explained_variance_ratio": [
+      0.35321671130387383,
+      0.1787555676647133,
+      0.17036243545829152,
+      0.0890948549204846,
+      0.07455359240331555,
+      0.04841443218910756,
+      0.04079845794535184,
+      0.03241669053029828,
+      0.012387011326216193,
+      2.462583472897005e-07
+    ],
+    "top_cumulative_explained_variance": [
+      0.35321671130387383,
+      0.5319722789685871,
+      0.7023347144268787,
+      0.7914295693473633,
+      0.8659831617506788,
+      0.9143975939397864,
+      0.9551960518851382,
+      0.9876127424154365,
+      0.9999997537416527,
+      1.0
+    ],
+    "feature_scores": [
+      {
+        "feature": "bestAsk",
+        "score": 0.23444716503107377
+      },
+      {
+        "feature": "volume24hr",
+        "score": 0.23049245533501958
+      },
+      {
+        "feature": "volume24hrClob",
+        "score": 0.23049245533501958
+      },
+      {
+        "feature": "volume",
+        "score": 0.21774686321232625
+      },
+      {
+        "feature": "volumeNum",
+        "score": 0.21774686321232625
+      },
+      {
+        "feature": "liquidityClob",
+        "score": 0.21708450540339558
+      },
+      {
+        "feature": "liquidity",
+        "score": 0.21708450540339533
+      },
+      {
+        "feature": "spread",
+        "score": 0.2048395952451319
+      },
+      {
+        "feature": "orderPriceMinTickSize",
+        "score": 0.19382187074010987
+      },
+      {
+        "feature": "bestBid",
+        "score": 0.18040907706069628
+      },
+      {
+        "feature": "oneWeekPriceChange",
+        "score": 0.1765597433050098
+      },
+      {
+        "feature": "oneMonthPriceChange",
+        "score": 0.17325294118944
+      },
+      {
+        "feature": "oneDayPriceChange",
+        "score": 0.16449039227030604
+      },
+      {
+        "feature": "liquidityAmm",
+        "score": 1.1705368824999188e-16
+      },
+      {
+        "feature": "oneYearPriceChange",
+        "score": 1.0399900829991234e-17
+      },
+      {
+        "feature": "orderMinSize",
+        "score": 2.452489184857282e-19
+      },
+      {
+        "feature": "volume24hrAmm",
+        "score": 0.0
+      }
+    ]
+  }
+}

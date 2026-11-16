@@ -1,0 +1,211 @@
+{
+  "comparison": {
+    "variance_threshold": 0.95,
+    "scaler": "standard",
+    "lower_intrinsic_dimensionality_domain": "stock",
+    "component_difference": 1
+  },
+  "stock": {
+    "domain": "stock",
+    "csv_path": "data/processed/nasdaq_cleaned_features.csv",
+    "n_rows": 24161466,
+    "n_original_columns": 15,
+    "dropped_columns": [
+      "date",
+      "ticker",
+      "Target_Log_Return"
+    ],
+    "n_numeric_features_used": 12,
+    "scaler": "standard",
+    "variance_threshold": 0.95,
+    "components_to_threshold": 4,
+    "components_used_for_feature_scores": 4,
+    "top_explained_variance_ratio": [
+      0.6174685243527859,
+      0.166667587473522,
+      0.1017461078191418,
+      0.06491958511805483,
+      0.04874896705242909,
+      0.0003578645653780798,
+      9.136361868832229e-05,
+      4.0698879129284945e-17,
+      1.3797152087589326e-17,
+      0.0
+    ],
+    "top_cumulative_explained_variance": [
+      0.6174685243527859,
+      0.7841361118263079,
+      0.8858822196454498,
+      0.9508018047635046,
+      0.9995507718159338,
+      0.9999086363813119,
+      1.0000000000000002,
+      1.0000000000000002,
+      1.0000000000000002,
+      1.0000000000000002
+    ],
+    "feature_scores": [
+      {
+        "feature": "price_lag_3d_robust",
+        "score": 0.22449742278900256
+      },
+      {
+        "feature": "price_lag_3d_std",
+        "score": 0.22449742278900245
+      },
+      {
+        "feature": "price_lag_1d_std",
+        "score": 0.22448745138117704
+      },
+      {
+        "feature": "price_lag_1d_robust",
+        "score": 0.22448745138117696
+      },
+      {
+        "feature": "close_robust",
+        "score": 0.22438258852752516
+      },
+      {
+        "feature": "close_std",
+        "score": 0.22438258852752502
+      },
+      {
+        "feature": "rolling_volatility_7d_robust",
+        "score": 0.1988540623761254
+      },
+      {
+        "feature": "rolling_volatility_7d_std",
+        "score": 0.19885406237612532
+      },
+      {
+        "feature": "day_of_week_cos",
+        "score": 0.1183577588151183
+      },
+      {
+        "feature": "volume_robust",
+        "score": 0.11823763117301511
+      },
+      {
+        "feature": "volume_std",
+        "score": 0.1182376311730151
+      },
+      {
+        "feature": "day_of_week_sin",
+        "score": 0.11803257111161788
+      }
+    ]
+  },
+  "polymarket": {
+    "domain": "polymarket",
+    "csv_path": "data/processed/polymarket_cleaned_features.csv",
+    "n_rows": 2582,
+    "n_original_columns": 23,
+    "dropped_columns": [
+      "Date",
+      "market_id",
+      "conditionId",
+      "umaResolutionStatus",
+      "Target_Deviation",
+      "final_settlement"
+    ],
+    "n_numeric_features_used": 17,
+    "scaler": "standard",
+    "variance_threshold": 0.95,
+    "components_to_threshold": 5,
+    "components_used_for_feature_scores": 5,
+    "top_explained_variance_ratio": [
+      0.5748714553086574,
+      0.17668180784358384,
+      0.12818875530651624,
+      0.05888073338443201,
+      0.05852155321106053,
+      0.0021347865979541953,
+      0.0007209083477957386,
+      8.049866193695647e-17,
+      3.8295149049094664e-17,
+      3.037394792393643e-17
+    ],
+    "top_cumulative_explained_variance": [
+      0.5748714553086574,
+      0.7515532631522412,
+      0.8797420184587574,
+      0.9386227518431894,
+      0.99714430505425,
+      0.9992790916522042,
+      0.9999999999999999,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "feature_scores": [
+      {
+        "feature": "price_lag_3d",
+        "score": 0.19577074644901632
+      },
+      {
+        "feature": "price_lag_3d_robust",
+        "score": 0.1957707464490163
+      },
+      {
+        "feature": "price_lag_3d_std",
+        "score": 0.19577074644901626
+      },
+      {
+        "feature": "price_lag_1d",
+        "score": 0.19543712435606458
+      },
+      {
+        "feature": "price_lag_1d_std",
+        "score": 0.19543712435606456
+      },
+      {
+        "feature": "price_lag_1d_robust",
+        "score": 0.19543712435606456
+      },
+      {
+        "feature": "price_robust",
+        "score": 0.19515490084442905
+      },
+      {
+        "feature": "price_std",
+        "score": 0.19515490084442896
+      },
+      {
+        "feature": "price",
+        "score": 0.1951549008444287
+      },
+      {
+        "feature": "rolling_volatility_7d_std",
+        "score": 0.18341823146566594
+      },
+      {
+        "feature": "rolling_volatility_7d_robust",
+        "score": 0.18341823146566594
+      },
+      {
+        "feature": "rolling_volatility_7d",
+        "score": 0.18341823146566588
+      },
+      {
+        "feature": "vol_quote",
+        "score": 0.10861112985061673
+      },
+      {
+        "feature": "vol_quote_std",
+        "score": 0.10861112985061638
+      },
+      {
+        "feature": "vol_quote_robust",
+        "score": 0.10861112985061637
+      },
+      {
+        "feature": "day_of_week_sin",
+        "score": 0.09113444135227035
+      },
+      {
+        "feature": "day_of_week_cos",
+        "score": 0.0836435055942547
+      }
+    ]
+  }
+}

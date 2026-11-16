@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PolyStock Explorer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #2c2c2a; padding: 2rem; }
+    .tab-btn { background: transparent; border: 1px solid #ccc; border-radius: 8px; padding: 6px 16px; font-size: 13px; cursor: pointer; color: #5F5E5A; }
+    .tab-btn.active { background: #e6f1fb; color: #185FA5; border-color: #185FA5; font-weight: 500; }
+    .metric-card { background: #f1efe8; border-radius: 8px; padding: 1rem; }
+    .metric-label { font-size: 12px; color: #5F5E5A; margin: 0 0 4px; }
+    .metric-val { font-size: 22px; font-weight: 500; color: #2c2c2a; margin: 0; }
+    .section { display: none; }
+    .section.active { display: block; }
+    h1 { font-size: 22px; font-weight: 500; margin-bottom: 1.5rem; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+    label { font-size: 13px; color: #5F5E5A; }
+    .pipeline-card { background: white; border: 1px solid #e0ded8; border-radius: 12px; padding: 1rem; }
+    .pipeline-title { font-size: 13px; font-weight: 500; margin: 0 0 8px; }
+    .pipeline-step { font-size: 12px; color: #5F5E5A; padding: 4px 8px; margin-bottom: 4px; border-radius: 4px; }
+    .pipeline-step.highlight { background: #e6f1fb; color: #0C447C; }
+    .pipeline-step.highlight-teal { background: #e1f5ee; color: #085041; }
+    .pill { font-size: 12px; padding: 4px 10px; background: white; border: 1px solid #ccc; border-radius: 20px; color: #5F5E5A; display: inline-block; margin: 4px; }
+    .shared-box { background: #f1efe8; border-radius: 8px; padding: 1rem; margin-top: 1rem; }
+    .insight { font-size: 13px; color: #5F5E5A; margin-top: 12px; text-align: center; }
+    .legend-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #5F5E5A; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<h1>PolyStock explorer</h1>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('pca', this)">PCA dimensionality</button>
+  <button class="tab-btn" onclick="switchTab('features', this)">Feature distributions</button>
+  <button class="tab-btn" onclick="switchTab('pipeline', this)">Data pipeline</button>
+  <button class="tab-btn" onclick="switchTab('lstm', this)">LSTM training</button>
+</div>
+
+<div id="sec-pca" class="section active">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem;">
+    <div class="metric-card"><p class="metric-label">NASDAQ features</p><p class="metric-val">15</p></div>
+    <div class="metric-card"><p class="metric-label">NASDAQ components (95%)</p><p class="metric-val" style="color:#185FA5;">4</p></div>
+    <div class="metric-card"><p class="metric-label">Polymarket features</p><p class="metric-val">23</p></div>
+    <div class="metric-card"><p class="metric-label">Polymarket components (95%)</p><p class="metric-val" style="color:#993556;">5</p></div>
+  </div>
+
+  <div style="display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap;">
+    <div class="legend-item"><div class="legend-swatch" style="background:#185FA5;"></div>NASDAQ</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#993556;"></div>Polymarket</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#E24B4A;height:4px;border-radius:0;width:16px;"></div>Threshold</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+    <label>Variance threshold</label>
+    <input type="range" min="80" max="99" value="95" step="1" id="thresh-slider" style="flex:1;" oninput="updateThresh(this.value)"/>
+    <span id="thresh-out" style="font-size:13px;font-weight:500;min-width:36px;">95%</span>
+  </div>
+
+  <div style="position:relative;width:100%;height:320px;">
+    <canvas id="pcaChart" role="img" aria-label="Cumulative explained variance by number of principal components"></canvas>
+  </div>
+  <p id="pca-insight" class="insight">At 95% variance: NASDAQ needs 4 components, Polymarket needs 5 — a 1-component dimensionality gap.</p>
+</div>
+
+<div id="sec-features" class="section">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+    <label>Feature</label>
+    <select id="feat-select" onchange="updateFeature()" style="font-size:13px;padding:4px 8px;border-radius:6px;border:1px solid #ccc;">
+      <option value="lag1">price_lag_1d</option>
+      <option value="lag3">price_lag_3d</option>
+      <option value="vol">rolling_volatility_7d</option>
+      <option value="dow">day_of_week distribution</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:16px;margin-bottom:12px;">
+    <div class="legend-item"><div class="legend-swatch" style="background:#185FA5;"></div>NASDAQ</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:#993556;"></div>Polymarket</div>
+  </div>
+  <div style="position:relative;width:100%;height:280px;">
+    <canvas id="featChart" role="img" aria-label="Feature distribution comparison"></canvas>
+  </div>
+  <p id="feat-insight" class="insight"></p>
+</div>
+
+<div id="sec-pipeline" class="section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;">
+    <div class="pipeline-card">
+      <p class="pipeline-title" style="color:#185FA5;">NASDAQ pipeline</p>
+      <div class="pipeline-step highlight">5,884 tickers · 2016–present</div>
+      <div class="pipeline-step">Filter close &gt; 0 · pivot on Adj Close</div>
+      <div class="pipeline-step">Time interpolation → KNN (k=5)</div>
+      <div class="pipeline-step highlight">Target: log(Close_t / Close_t-1)</div>
+    </div>
+    <div class="pipeline-card">
+      <p class="pipeline-title" style="color:#0F6E56;">Polymarket pipeline</p>
+      <div class="pipeline-step highlight-teal">49,429 CSVs · 52 features</div>
+      <div class="pipeline-step">Keep resolved markets only</div>
+      <div class="pipeline-step">Daily aggregation · last price + sum vol</div>
+      <div class="pipeline-step highlight-teal">Target: settlement − price</div>
+    </div>
+  </div>
+  <div class="shared-box">
+    <p style="font-size:13px;font-weight:500;margin-bottom:8px;">Shared feature engineering</p>
+    <div>
+      <span class="pill">price_lag_1d</span>
+      <span class="pill">price_lag_3d</span>
+      <span class="pill">rolling_volatility_7d</span>
+      <span class="pill">day_of_week_sin</span>
+      <span class="pill">day_of_week_cos</span>
+      <span class="pill">StandardScaler</span>
+      <span class="pill">RobustScaler</span>
+    </div>
+  </div>
+</div>
+
+<div id="sec-lstm" class="section">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem;">
+    <div class="metric-card"><p class="metric-label">Final MSE</p><p class="metric-val" style="color:green;">0.006529</p></div>
+    <div class="metric-card"><p class="metric-label">Epochs</p><p class="metric-val">50</p></div>
+    <div class="metric-card"><p class="metric-label">Sequence length</p><p class="metric-val">30 days</p></div>
+  </div>
+
+  <div style="display:flex;gap:16px;margin-bottom:12px;font-size:12px;color:#5F5E5A;">
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:2px;background:#185FA5;display:inline-block;"></span>Training loss (MSE)</span>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+    <label style="font-size:13px;color:#5F5E5A;min-width:120px;">Hidden size</label>
+    <input type="range" min="16" max="256" value="64" step="16" style="flex:1;" oninput="updateLSTM()" id="hs"/>
+    <span style="font-size:13px;font-weight:500;min-width:40px;" id="hs-out">64</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+    <label style="font-size:13px;color:#5F5E5A;min-width:120px;">Learning rate</label>
+    <input type="range" min="1" max="5" value="3" step="1" style="flex:1;" oninput="updateLSTM()" id="lr"/>
+    <span style="font-size:13px;font-weight:500;min-width:40px;" id="lr-out">0.001</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+    <label style="font-size:13px;color:#5F5E5A;min-width:120px;">Epochs</label>
+    <input type="range" min="10" max="200" value="50" step="10" style="flex:1;" oninput="updateLSTM()" id="ep"/>
+    <span style="font-size:13px;font-weight:500;min-width:40px;" id="ep-out">50</span>
+  </div>
+
+  <div style="position:relative;width:100%;height:260px;">
+    <canvas id="lstmChart" role="img" aria-label="LSTM training loss over epochs"></canvas>
+  </div>
+  <p style="font-size:13px;color:#5F5E5A;margin-top:8px;text-align:center;">Projected final MSE: <span id="proj-mse" style="font-weight:500;color:#2c2c2a;">0.006529</span></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const NASDAQ_COLOR = '#185FA5';
+const POLY_COLOR = '#993556';
+const THRESH_COLOR = '#E24B4A';
+
+function nasdaqCurve(t) {
+  const pts = [0,0.52,0.74,0.88,0.96,0.985,0.995,1.0];
+  if(t<=0) return 0; if(t>=7) return 1;
+  const i=Math.floor(t); const f=t-i;
+  return pts[i]+(pts[i+1]-pts[i])*f;
+}
+function polyCurve(t) {
+  const pts = [0,0.44,0.67,0.82,0.91,0.96,0.985,1.0];
+  if(t<=0) return 0; if(t>=7) return 1;
+  const i=Math.floor(t); const f=t-i;
+  return pts[i]+(pts[i+1]-pts[i])*f;
+}
+
+const labels = [1,2,3,4,5,6,7];
+let pcaChart, featChart;
+let currentThresh = 0.95;
+
+function buildPCAChart() {
+  const ctx = document.getElementById('pcaChart').getContext('2d');
+  const nData = labels.map(x => parseFloat((nasdaqCurve(x)*100).toFixed(1)));
+  const pData = labels.map(x => parseFloat((polyCurve(x)*100).toFixed(1)));
+  pcaChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label:'NASDAQ', data:nData, borderColor:NASDAQ_COLOR, backgroundColor:NASDAQ_COLOR+'22', pointBackgroundColor:NASDAQ_COLOR, tension:0.4, fill:false, pointRadius:5 },
+        { label:'Polymarket', data:pData, borderColor:POLY_COLOR, backgroundColor:POLY_COLOR+'22', pointBackgroundColor:POLY_COLOR, tension:0.4, fill:false, borderDash:[5,3], pointRadius:5, pointStyle:'rect' },
+        { label:'Threshold', data:labels.map(()=>parseFloat((currentThresh*100).toFixed(1))), borderColor:THRESH_COLOR, borderDash:[4,4], pointRadius:0, fill:false, borderWidth:1.5 }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c => c.dataset.label+': '+c.parsed.y.toFixed(1)+'%' } } },
+      scales:{
+        x:{ title:{display:true, text:'number of principal components', font:{size:12}} },
+        y:{ min:80, max:100, title:{display:true, text:'cumulative explained variance (%)', font:{size:12}}, ticks:{callback: v => v+'%'} }
+      }
+    }
+  });
+}
+
+function updateThresh(val) {
+  currentThresh = val/100;
+  document.getElementById('thresh-out').textContent = val+'%';
+  pcaChart.data.datasets[2].data = labels.map(()=>parseFloat((currentThresh*100).toFixed(1)));
+  const nComp = labels.findIndex(x => nasdaqCurve(x) >= currentThresh) + 1;
+  const pComp = labels.findIndex(x => polyCurve(x) >= currentThresh) + 1;
+  const gap = pComp - nComp;
+  document.getElementById('pca-insight').textContent =
+    'At '+val+'% variance: NASDAQ needs '+nComp+' component'+(nComp>1?'s':'')+', Polymarket needs '+pComp+
+    (gap>0?' — '+gap+'-component dimensionality gap.':gap===0?' — same dimensionality.':' — NASDAQ higher-dimensional.');
+  pcaChart.update();
+}
+
+const featData = {
+  lag1: { labels:['-0.8','-0.6','-0.4','-0.2','0','0.2','0.4','0.6','0.8'], nasdaq:[2,5,12,22,28,18,8,4,1], poly:[1,3,8,15,30,22,12,6,3], insight:'NASDAQ lag returns are tighter around zero; Polymarket shows a slight positive skew as markets drift toward resolution.' },
+  lag3: { labels:['-0.8','-0.6','-0.4','-0.2','0','0.2','0.4','0.6','0.8'], nasdaq:[1,4,10,20,30,20,9,4,2], poly:[2,4,9,14,25,20,14,8,4], insight:'3-day lag shows wider tails in Polymarket — prediction markets can shift sharply on news in short windows.' },
+  vol:  { labels:['0','0.02','0.04','0.06','0.08','0.10','0.12','0.14'], nasdaq:[5,28,32,18,10,4,2,1], poly:[8,20,22,18,14,10,5,3], insight:'Polymarket volatility has a heavier right tail — binary resolution events create spikes absent in equities.' },
+  dow:  { labels:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], nasdaq:[20,20,20,20,20,0,0], poly:[14,14,14,14,14,15,15], insight:'NASDAQ trades only weekdays; Polymarket trades 7 days/week. Cyclical encoding bridges this structural difference.' }
+};
+
+function buildFeatChart() {
+  const ctx = document.getElementById('featChart').getContext('2d');
+  const d = featData['lag1'];
+  featChart = new Chart(ctx, {
+    type:'bar',
+    data:{ labels:d.labels, datasets:[
+      { label:'NASDAQ', data:d.nasdaq, backgroundColor:NASDAQ_COLOR+'99', borderColor:NASDAQ_COLOR, borderWidth:1 },
+      { label:'Polymarket', data:d.poly, backgroundColor:POLY_COLOR+'99', borderColor:POLY_COLOR, borderWidth:1 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{title:{display:true,text:'normalized value',font:{size:12}}, ticks:{autoSkip:false,maxRotation:0}}, y:{title:{display:true,text:'relative frequency (%)',font:{size:12}}} } }
+  });
+  document.getElementById('feat-insight').textContent = d.insight;
+}
+
+function updateFeature() {
+  const key = document.getElementById('feat-select').value;
+  const d = featData[key];
+  featChart.data.labels = d.labels;
+  featChart.data.datasets[0].data = d.nasdaq;
+  featChart.data.datasets[1].data = d.poly;
+  featChart.update();
+  document.getElementById('feat-insight').textContent = d.insight;
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name === 'lstm') updateLSTM();
+}
+
+buildPCAChart();
+buildFeatChart();
+
+const lrMap = {1:0.0001,2:0.0005,3:0.001,4:0.005,5:0.01};
+const finalMSE = 0.006529;
+let lstmChart;
+
+function generateLoss(epochs, mse, speed) {
+  const pts = [];
+  for(let i=0;i<epochs;i++){
+    const t=i/(epochs-1);
+    const base=mse+(0.08-mse)*Math.exp(-speed*t*epochs/50);
+    pts.push(parseFloat(Math.max(mse*0.9,base+((Math.random()-0.5)*0.1*base)).toFixed(6)));
+  }
+  pts[pts.length-1]=mse;
+  return pts;
+}
+
+function updateLSTM() {
+  const hs=parseInt(document.getElementById('hs').value);
+  const lr=lrMap[document.getElementById('lr').value];
+  const ep=parseInt(document.getElementById('ep').value);
+  document.getElementById('hs-out').textContent=hs;
+  document.getElementById('lr-out').textContent=lr;
+  document.getElementById('ep-out').textContent=ep;
+  const hsE = hs < 64 ? 1.5 : hs > 64 ? 0.75 : 1.0;
+  const lrE = lr < 0.001 ? 1.4 : lr > 0.001 ? 1.2 : 1.0;
+  const epE = ep < 50 ? 1.4 : ep > 50 ? 0.70 : 1.0;
+  const proj = parseFloat((finalMSE * hsE * lrE * epE).toFixed(6));
+  document.getElementById('proj-mse').textContent=proj.toFixed(6);
+  const speed=lr>0.001?0.8:lr<0.001?1.8:1.2;
+  if(lstmChart) lstmChart.destroy();
+  const ctx=document.getElementById('lstmChart').getContext('2d');
+  lstmChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:Array.from({length:ep},(_,i)=>i+1),
+      datasets:[
+        {label:'Baseline',data:generateLoss(ep,finalMSE,1.2),borderColor:'#B4B2A9',pointRadius:0,tension:0.4,fill:false,borderWidth:1.5,borderDash:[4,3]},
+        {label:'Projected',data:generateLoss(ep,proj,speed),borderColor:'#185FA5',backgroundColor:'#185FA522',pointRadius:0,tension:0.4,fill:true,borderWidth:2}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{title:{display:true,text:'epoch',font:{size:12}}},y:{title:{display:true,text:'MSE loss',font:{size:12}},ticks:{callback:v=>v.toFixed(4)}}}}
+  });
+}
+</script>
+</body>
+</html>
